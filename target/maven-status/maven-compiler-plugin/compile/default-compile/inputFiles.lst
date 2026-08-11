@@ -9,6 +9,7 @@ C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\components\Ui.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\DashboardFrame.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\LoginFrame.java
+C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\panels\CrudPanel.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\panels\CustomerPanel.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\panels\DeliveryItemPanel.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\panels\DeliveryPanel.java
@@ -18,6 +19,7 @@ C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\panels\ProductionStagePanel.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\panels\ProductPanel.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\panels\StaffPanel.java
+C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\panels\UserPanel.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\ui\RegisterFrame.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\util\PasswordUtil.java
 C:\Users\kalan\OneDrive\Desktop\Project\-Garment-Management-System\src\main\java\com\nisal\garment\util\Theme.java

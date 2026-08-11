@@ -1,51 +1,35 @@
 package com.nisal.garment.ui.panels;
 
-import com.nisal.garment.dao.CrudDAO;
 import com.nisal.garment.model.SessionUser;
-import com.nisal.garment.ui.components.Ui;
-import com.nisal.garment.util.Theme;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.util.List;
 
-public class OrderPanel extends JPanel {
-    private final SessionUser user;
-    private final CrudDAO dao = new CrudDAO();
-    private final JTable table = new JTable();
-
+public class OrderPanel extends CrudPanel {
     public OrderPanel(SessionUser user) {
-        this.user = user;
-        setLayout(new BorderLayout(16,16));
-        setBorder(new EmptyBorder(22,28,28,28));
-        setBackground(Theme.BG);
-
-        JButton refresh = Ui.outlineButton("↻  Refresh");
-        refresh.addActionListener(e -> load());
-
-        add(Ui.sectionHeader("Orders", "View and monitor orders.", refresh), BorderLayout.NORTH);
-
-        JPanel card = Ui.card();
-        card.setBorder(new EmptyBorder(10,10,10,10));
-        Ui.styleTable(table);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
-        add(card, BorderLayout.CENTER);
-        load();
+        super(user, "Orders", "Manage customer orders.",
+                new String[]{"ID", "Customer", "Order Date", "Due Date", "Status", "Total"},
+                List.of(
+                        new FieldSpec("Customer", COMBO, 1, "SELECT customer_id,name FROM customers ORDER BY name", true),
+                        new FieldSpec("Order Date", DATE, 2),
+                        new FieldSpec("Due Date", DATE, 3, false),
+                        new FieldSpec("Status", TEXT, 4),
+                        new FieldSpec("Total Amount", DECIMAL, 5)
+                ));
     }
 
-    private void load() {
-        try {
-            var rows = dao.select("SELECT order_id,customer_id,order_date,due_date,status,total_amount FROM orders");
-            DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Customer", "Order Date", "Due Date", "Status", "Total"}, 0) {
-                @Override public boolean isCellEditable(int row, int column) { return false; }
-            };
-            for (Object[] row : rows) model.addRow(row);
-            table.setModel(model);
-            Ui.styleTable(table);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Database error:\n" + ex.getMessage(),
-                    "Database", JOptionPane.ERROR_MESSAGE);
-        }
+    @Override protected String selectSql() {
+        return "SELECT order_id,customer_id,order_date,due_date,status,total_amount FROM orders ORDER BY order_id";
+    }
+
+    @Override protected String insertSql() {
+        return "INSERT INTO orders(customer_id,order_date,due_date,status,total_amount) VALUES(?,?,?,?,?)";
+    }
+
+    @Override protected String updateSql() {
+        return "UPDATE orders SET customer_id=?,order_date=?,due_date=?,status=?,total_amount=? WHERE order_id=?";
+    }
+
+    @Override protected String deleteSql() {
+        return "DELETE FROM orders WHERE order_id=?";
     }
 }

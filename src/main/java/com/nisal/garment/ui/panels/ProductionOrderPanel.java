@@ -1,51 +1,35 @@
 package com.nisal.garment.ui.panels;
 
-import com.nisal.garment.dao.CrudDAO;
 import com.nisal.garment.model.SessionUser;
-import com.nisal.garment.ui.components.Ui;
-import com.nisal.garment.util.Theme;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.util.List;
 
-public class ProductionOrderPanel extends JPanel {
-    private final SessionUser user;
-    private final CrudDAO dao = new CrudDAO();
-    private final JTable table = new JTable();
-
+public class ProductionOrderPanel extends CrudPanel {
     public ProductionOrderPanel(SessionUser user) {
-        this.user = user;
-        setLayout(new BorderLayout(16,16));
-        setBorder(new EmptyBorder(22,28,28,28));
-        setBackground(Theme.BG);
-
-        JButton refresh = Ui.outlineButton("↻  Refresh");
-        refresh.addActionListener(e -> load());
-
-        add(Ui.sectionHeader("Production Orders", "View and monitor production orders.", refresh), BorderLayout.NORTH);
-
-        JPanel card = Ui.card();
-        card.setBorder(new EmptyBorder(10,10,10,10));
-        Ui.styleTable(table);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
-        add(card, BorderLayout.CENTER);
-        load();
+        super(user, "Production Orders", "Assign orders to production.",
+                new String[]{"ID", "Order", "Staff", "Start", "Expected", "Status"},
+                List.of(
+                        new FieldSpec("Order", COMBO, 1, "SELECT order_id, CONCAT('Order #', order_id) FROM orders ORDER BY order_id", true),
+                        new FieldSpec("Assigned Staff", COMBO, 2, "SELECT staff_id, name FROM staff ORDER BY name", false),
+                        new FieldSpec("Start Date", DATE, 3, false),
+                        new FieldSpec("Expected Date", DATE, 4, false),
+                        new FieldSpec("Status", TEXT, 5)
+                ));
     }
 
-    private void load() {
-        try {
-            var rows = dao.select("SELECT production_order_id,order_id,assigned_staff_id,start_date,expected_date,status FROM production_orders");
-            DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Order", "Staff", "Start", "Expected", "Status"}, 0) {
-                @Override public boolean isCellEditable(int row, int column) { return false; }
-            };
-            for (Object[] row : rows) model.addRow(row);
-            table.setModel(model);
-            Ui.styleTable(table);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Database error:\n" + ex.getMessage(),
-                    "Database", JOptionPane.ERROR_MESSAGE);
-        }
+    @Override protected String selectSql() {
+        return "SELECT production_order_id,order_id,assigned_staff_id,start_date,expected_date,status FROM production_orders ORDER BY production_order_id";
+    }
+
+    @Override protected String insertSql() {
+        return "INSERT INTO production_orders(order_id,assigned_staff_id,start_date,expected_date,status) VALUES(?,?,?,?,?)";
+    }
+
+    @Override protected String updateSql() {
+        return "UPDATE production_orders SET order_id=?,assigned_staff_id=?,start_date=?,expected_date=?,status=? WHERE production_order_id=?";
+    }
+
+    @Override protected String deleteSql() {
+        return "DELETE FROM production_orders WHERE production_order_id=?";
     }
 }

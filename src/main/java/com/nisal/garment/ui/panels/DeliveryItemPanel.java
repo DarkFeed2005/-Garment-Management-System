@@ -1,51 +1,33 @@
 package com.nisal.garment.ui.panels;
 
-import com.nisal.garment.dao.CrudDAO;
 import com.nisal.garment.model.SessionUser;
-import com.nisal.garment.ui.components.Ui;
-import com.nisal.garment.util.Theme;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.util.List;
 
-public class DeliveryItemPanel extends JPanel {
-    private final SessionUser user;
-    private final CrudDAO dao = new CrudDAO();
-    private final JTable table = new JTable();
-
+public class DeliveryItemPanel extends CrudPanel {
     public DeliveryItemPanel(SessionUser user) {
-        this.user = user;
-        setLayout(new BorderLayout(16,16));
-        setBorder(new EmptyBorder(22,28,28,28));
-        setBackground(Theme.BG);
-
-        JButton refresh = Ui.outlineButton("↻  Refresh");
-        refresh.addActionListener(e -> load());
-
-        add(Ui.sectionHeader("Delivery Items", "View and monitor delivery items.", refresh), BorderLayout.NORTH);
-
-        JPanel card = Ui.card();
-        card.setBorder(new EmptyBorder(10,10,10,10));
-        Ui.styleTable(table);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
-        add(card, BorderLayout.CENTER);
-        load();
+        super(user, "Delivery Items", "Manage items in each delivery.",
+                new String[]{"ID", "Delivery", "Product", "Quantity"},
+                List.of(
+                        new FieldSpec("Delivery", COMBO, 1, "SELECT delivery_id, CONCAT('Delivery #', delivery_id) FROM deliveries ORDER BY delivery_id", true),
+                        new FieldSpec("Product", COMBO, 2, "SELECT product_id, name FROM products ORDER BY name", true),
+                        new FieldSpec("Quantity", INT, 3)
+                ));
     }
 
-    private void load() {
-        try {
-            var rows = dao.select("SELECT delivery_item_id,delivery_id,product_id,quantity FROM delivery_items");
-            DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Delivery", "Product", "Quantity"}, 0) {
-                @Override public boolean isCellEditable(int row, int column) { return false; }
-            };
-            for (Object[] row : rows) model.addRow(row);
-            table.setModel(model);
-            Ui.styleTable(table);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Database error:\n" + ex.getMessage(),
-                    "Database", JOptionPane.ERROR_MESSAGE);
-        }
+    @Override protected String selectSql() {
+        return "SELECT delivery_item_id,delivery_id,product_id,quantity FROM delivery_items ORDER BY delivery_item_id";
+    }
+
+    @Override protected String insertSql() {
+        return "INSERT INTO delivery_items(delivery_id,product_id,quantity) VALUES(?,?,?)";
+    }
+
+    @Override protected String updateSql() {
+        return "UPDATE delivery_items SET delivery_id=?,product_id=?,quantity=? WHERE delivery_item_id=?";
+    }
+
+    @Override protected String deleteSql() {
+        return "DELETE FROM delivery_items WHERE delivery_item_id=?";
     }
 }

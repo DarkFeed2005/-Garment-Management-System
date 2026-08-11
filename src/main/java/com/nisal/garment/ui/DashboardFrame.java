@@ -141,7 +141,7 @@ public class DashboardFrame extends JFrame {
         b.setAlignmentX(Component.LEFT_ALIGNMENT);
         b.setMaximumSize(new Dimension(Integer.MAX_VALUE,44));
         b.setPreferredSize(new Dimension(210,44));
-        b.setBackground(Theme.NAVY);
+        b.setBackground(Theme.BLUE);
         b.setBorder(new EmptyBorder(10,12,10,10));
         b.setFocusPainted(false);
         b.setOpaque(true);
@@ -151,7 +151,7 @@ public class DashboardFrame extends JFrame {
 
     private void refreshActive(String key) {
         for(var e:nav.entrySet()) {
-            e.getValue().setBackground(e.getKey().equals(key) ? Theme.NAVY_2 : Theme.NAVY);
+            e.getValue().setBackground(e.getKey().equals(key) ? Theme.BLUE_DARK : Theme.BLUE);
         }
     }
 
@@ -205,7 +205,7 @@ public class DashboardFrame extends JFrame {
             content.add(new DeliveryPanel(user),"DELIVERIES");
             content.add(new DeliveryItemPanel(user),"DELIVERY_ITEMS");
         }
-        if(AccessControl.canManageUsers(user)) content.add(userPanel(),"USERS");
+        if(AccessControl.canManageUsers(user)) content.add(new UserPanel(user),"USERS");
         cards.show(content,"HOME");
         refreshActive("HOME");
     }
@@ -257,18 +257,6 @@ public class DashboardFrame extends JFrame {
         about.add(Ui.muted("A simple desktop management system for customers, products, orders, production and deliveries."));
         bottom.add(quick); bottom.add(about);
         p.add(bottom,BorderLayout.SOUTH);
-        return p;
-    }
-
-    private JPanel userPanel() {
-        JPanel p=new JPanel(new BorderLayout());
-        p.setBackground(Theme.BG);
-        p.setBorder(new EmptyBorder(24,28,28,28));
-        p.add(Ui.sectionHeader("User Management","Administrator-only system access.",
-                Ui.outlineButton("Refresh")),BorderLayout.NORTH);
-        JPanel card=Ui.card();
-        card.add(Ui.muted("User management is restricted to administrators. Extend this panel with CRUD actions when required by your database design."),BorderLayout.CENTER);
-        p.add(card,BorderLayout.CENTER);
         return p;
     }
 }

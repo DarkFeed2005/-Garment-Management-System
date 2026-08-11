@@ -1,51 +1,34 @@
 package com.nisal.garment.ui.panels;
 
-import com.nisal.garment.dao.CrudDAO;
 import com.nisal.garment.model.SessionUser;
-import com.nisal.garment.ui.components.Ui;
-import com.nisal.garment.util.Theme;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.util.List;
 
-public class CustomerPanel extends JPanel {
-    private final SessionUser user;
-    private final CrudDAO dao = new CrudDAO();
-    private final JTable table = new JTable();
-
+public class CustomerPanel extends CrudPanel {
     public CustomerPanel(SessionUser user) {
-        this.user = user;
-        setLayout(new BorderLayout(16,16));
-        setBorder(new EmptyBorder(22,28,28,28));
-        setBackground(Theme.BG);
-
-        JButton refresh = Ui.outlineButton("↻  Refresh");
-        refresh.addActionListener(e -> load());
-
-        add(Ui.sectionHeader("Customers", "View and monitor customers.", refresh), BorderLayout.NORTH);
-
-        JPanel card = Ui.card();
-        card.setBorder(new EmptyBorder(10,10,10,10));
-        Ui.styleTable(table);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
-        add(card, BorderLayout.CENTER);
-        load();
+        super(user, "Customers", "Manage customer records.",
+                new String[]{"Customer ID", "Name", "Phone", "Email", "Address"},
+                List.of(
+                        new FieldSpec("Name", TEXT, 1),
+                        new FieldSpec("Phone", TEXT, 2),
+                        new FieldSpec("Email", TEXT, 3),
+                        new FieldSpec("Address", TEXT, 4)
+                ));
     }
 
-    private void load() {
-        try {
-            var rows = dao.select("SELECT customer_id,name,phone,email,address FROM customers");
-            DefaultTableModel model = new DefaultTableModel(new String[]{"Customer ID", "Name", "Phone", "Email", "Address"}, 0) {
-                @Override public boolean isCellEditable(int row, int column) { return false; }
-            };
-            for (Object[] row : rows) model.addRow(row);
-            table.setModel(model);
-            Ui.styleTable(table);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Database error:\n" + ex.getMessage(),
-                    "Database", JOptionPane.ERROR_MESSAGE);
-        }
+    @Override protected String selectSql() {
+        return "SELECT customer_id,name,phone,email,address FROM customers ORDER BY customer_id";
+    }
+
+    @Override protected String insertSql() {
+        return "INSERT INTO customers(name,phone,email,address) VALUES(?,?,?,?)";
+    }
+
+    @Override protected String updateSql() {
+        return "UPDATE customers SET name=?,phone=?,email=?,address=? WHERE customer_id=?";
+    }
+
+    @Override protected String deleteSql() {
+        return "DELETE FROM customers WHERE customer_id=?";
     }
 }

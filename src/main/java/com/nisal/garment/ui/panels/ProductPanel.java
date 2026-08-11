@@ -1,51 +1,37 @@
 package com.nisal.garment.ui.panels;
 
-import com.nisal.garment.dao.CrudDAO;
 import com.nisal.garment.model.SessionUser;
-import com.nisal.garment.ui.components.Ui;
-import com.nisal.garment.util.Theme;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.util.List;
 
-public class ProductPanel extends JPanel {
-    private final SessionUser user;
-    private final CrudDAO dao = new CrudDAO();
-    private final JTable table = new JTable();
-
+public class ProductPanel extends CrudPanel {
     public ProductPanel(SessionUser user) {
-        this.user = user;
-        setLayout(new BorderLayout(16,16));
-        setBorder(new EmptyBorder(22,28,28,28));
-        setBackground(Theme.BG);
-
-        JButton refresh = Ui.outlineButton("↻  Refresh");
-        refresh.addActionListener(e -> load());
-
-        add(Ui.sectionHeader("Products", "View and monitor products.", refresh), BorderLayout.NORTH);
-
-        JPanel card = Ui.card();
-        card.setBorder(new EmptyBorder(10,10,10,10));
-        Ui.styleTable(table);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
-        add(card, BorderLayout.CENTER);
-        load();
+        super(user, "Products", "Manage the product catalogue.",
+                new String[]{"ID", "Code", "Name", "Category", "Size", "Unit Price", "Stock", "Status"},
+                List.of(
+                        new FieldSpec("Product Code", TEXT, 1),
+                        new FieldSpec("Name", TEXT, 2),
+                        new FieldSpec("Category", TEXT, 3),
+                        new FieldSpec("Size", TEXT, 4),
+                        new FieldSpec("Unit Price", DECIMAL, 5),
+                        new FieldSpec("Stock Qty", INT, 6),
+                        new FieldSpec("Status", TEXT, 7)
+                ));
     }
 
-    private void load() {
-        try {
-            var rows = dao.select("SELECT product_id,product_code,name,category,size,unit_price,stock_qty,status FROM products");
-            DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Code", "Name", "Category", "Size", "Unit Price", "Stock", "Status"}, 0) {
-                @Override public boolean isCellEditable(int row, int column) { return false; }
-            };
-            for (Object[] row : rows) model.addRow(row);
-            table.setModel(model);
-            Ui.styleTable(table);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Database error:\n" + ex.getMessage(),
-                    "Database", JOptionPane.ERROR_MESSAGE);
-        }
+    @Override protected String selectSql() {
+        return "SELECT product_id,product_code,name,category,size,unit_price,stock_qty,status FROM products ORDER BY product_id";
+    }
+
+    @Override protected String insertSql() {
+        return "INSERT INTO products(product_code,name,category,size,unit_price,stock_qty,status) VALUES(?,?,?,?,?,?,?)";
+    }
+
+    @Override protected String updateSql() {
+        return "UPDATE products SET product_code=?,name=?,category=?,size=?,unit_price=?,stock_qty=?,status=? WHERE product_id=?";
+    }
+
+    @Override protected String deleteSql() {
+        return "DELETE FROM products WHERE product_id=?";
     }
 }

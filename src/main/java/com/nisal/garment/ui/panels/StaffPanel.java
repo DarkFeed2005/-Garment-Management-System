@@ -1,51 +1,34 @@
 package com.nisal.garment.ui.panels;
 
-import com.nisal.garment.dao.CrudDAO;
 import com.nisal.garment.model.SessionUser;
-import com.nisal.garment.ui.components.Ui;
-import com.nisal.garment.util.Theme;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.util.List;
 
-public class StaffPanel extends JPanel {
-    private final SessionUser user;
-    private final CrudDAO dao = new CrudDAO();
-    private final JTable table = new JTable();
-
+public class StaffPanel extends CrudPanel {
     public StaffPanel(SessionUser user) {
-        this.user = user;
-        setLayout(new BorderLayout(16,16));
-        setBorder(new EmptyBorder(22,28,28,28));
-        setBackground(Theme.BG);
-
-        JButton refresh = Ui.outlineButton("↻  Refresh");
-        refresh.addActionListener(e -> load());
-
-        add(Ui.sectionHeader("Staff", "View and monitor staff.", refresh), BorderLayout.NORTH);
-
-        JPanel card = Ui.card();
-        card.setBorder(new EmptyBorder(10,10,10,10));
-        Ui.styleTable(table);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
-        add(card, BorderLayout.CENTER);
-        load();
+        super(user, "Staff", "Manage factory staff.",
+                new String[]{"ID", "Name", "Phone", "Department", "Position"},
+                List.of(
+                        new FieldSpec("Name", TEXT, 1),
+                        new FieldSpec("Phone", TEXT, 2),
+                        new FieldSpec("Department", TEXT, 3),
+                        new FieldSpec("Position", TEXT, 4)
+                ));
     }
 
-    private void load() {
-        try {
-            var rows = dao.select("SELECT staff_id,name,phone,department,position FROM staff");
-            DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Name", "Phone", "Department", "Position"}, 0) {
-                @Override public boolean isCellEditable(int row, int column) { return false; }
-            };
-            for (Object[] row : rows) model.addRow(row);
-            table.setModel(model);
-            Ui.styleTable(table);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Database error:\n" + ex.getMessage(),
-                    "Database", JOptionPane.ERROR_MESSAGE);
-        }
+    @Override protected String selectSql() {
+        return "SELECT staff_id,name,phone,department,position FROM staff ORDER BY staff_id";
+    }
+
+    @Override protected String insertSql() {
+        return "INSERT INTO staff(name,phone,department,position) VALUES(?,?,?,?)";
+    }
+
+    @Override protected String updateSql() {
+        return "UPDATE staff SET name=?,phone=?,department=?,position=? WHERE staff_id=?";
+    }
+
+    @Override protected String deleteSql() {
+        return "DELETE FROM staff WHERE staff_id=?";
     }
 }
